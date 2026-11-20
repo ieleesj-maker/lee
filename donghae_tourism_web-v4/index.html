@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>동해시 관광 가이드 - 신비와 활력이 숨쉬는 바다·산소도시</title>
+    <style>
+        :root {
+            --primary-color: #0066cc;
+            --secondary-color: #00a8cc;
+            --dark-color: #222222;
+            --light-color: #f8f9fa;
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif;
+            color: var(--dark-color);
+            line-height: 1.6;
+            background-color: #fff;
+        }
+
+        /* 헤더 스타일 - images 폴더의 header.png 사용 */
+        header {
+            background: linear-gradient(rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.45)), url('images/header.png') no-repeat center center/cover;
+            color: white;
+            text-align: center;
+            padding: 130px 20px;
+        }
+
+        header h1 {
+            font-size: 2.8rem;
+            margin-bottom: 15px;
+            text-shadow: 2px 2px 6px rgba(0,0,0,0.6);
+        }
+
+        header p {
+            font-size: 1.2rem;
+            max-width: 700px;
+            margin: 0 auto;
+            text-shadow: 1px 1px 4px rgba(0,0,0,0.6);
+        }
+
+        /* 권역 필터 내비게이션 */
+        .filter-bar {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 35px;
+        }
+
+        .filter-btn {
+            background: var(--light-color);
+            border: 1px solid #d0d7de;
+            color: var(--dark-color);
+            padding: 8px 18px;
+            border-radius: 20px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .filter-btn:hover, .filter-btn.active {
+            background: var(--primary-color);
+            color: #fff;
+            border-color: var(--primary-color);
+        }
+
+        /* 메인 컨테이너 */
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 50px 20px;
+        }
+
+        section {
+            margin-bottom: 60px;
+        }
+
+        h2.section-title {
+            text-align: center;
+            font-size: 2rem;
+            margin-bottom: 30px;
+            color: var(--primary-color);
+            position: relative;
+            padding-bottom: 15px;
+        }
+
+        h2.section-title::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 3px;
+            background-color: var(--secondary-color);
+        }
+
+        /* 권역별 카드 그리드 레이아웃 */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 30px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            transition: var(--transition);
+            cursor: pointer;
+        }
+
+        .card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 10px 28px rgba(0,0,0,0.16);
+        }
+
+        .card.hidden {
+            display: none;
+        }
+
+        .card-img {
+            height: 220px;
+            width: 100%;
+            object-fit: cover;
+            background-color: #e9ecef;
+            display: block;
+        }
+
+        .card-content {
+            padding: 25px;
+        }
+
+        .card-content h3 {
+            font-size: 1.3rem;
+            margin-bottom: 10px;
+            color: var(--primary-color);
+        }
+
+        .card-content p {
+            font-size: 0.95rem;
+            color: #555;
+        }
+
+        /* 추천 코스 스타일 */
+        .course-box {
+            background-color: var(--light-color);
+            border-left: 5px solid var(--secondary-color);
+            padding: 25px;
+            margin-bottom: 20px;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .course-box h3 {
+            font-size: 1.2rem;
+            color: var(--dark-color);
+            margin-bottom: 10px;
+        }
+
+        .course-box p {
+            font-size: 1.05rem;
+            color: #555;
+        }
+
+        /* 라이트박스 모달 */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.8);
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal.open {
+            display: flex;
+        }
+
+        .modal-content {
+            background: #fff;
+            border-radius: 12px;
+            max-width: 720px;
+            width: 100%;
+            overflow: hidden;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.4);
+            position: relative;
+        }
+
+        .modal-content img {
+            width: 100%;
+            max-height: 420px;
+            object-fit: cover;
+            display: block;
+        }
+
+        .modal-body {
+            padding: 24px;
+        }
+
+        .modal-body h3 {
+            color: var(--primary-color);
+            margin-bottom: 10px;
+            font-size: 1.4rem;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 12px;
+            right: 16px;
+            background: rgba(0,0,0,0.6);
+            color: #fff;
+            border: none;
+            border-radius: 50%;
+            width: 36px;
+            height: 36px;
+            font-size: 1.2rem;
+            cursor: pointer;
+        }
+
+        /* 푸터 */
+        footer {
+            background-color: var(--dark-color);
+            color: white;
+            text-align: center;
+            padding: 30px 20px;
+            font-size: 0.9rem;
+        }
+
+        @media(max-width: 768px) {
+            header h1 {
+                font-size: 2.1rem;
+            }
+            header p {
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 헤더 섹션 -->
+    <header>
+        <h1>바다·산소도시 동해시 관광 가이드</h1>
+        <p>푸른 동해바다의 절경과 웅장한 명산, 다채로운 이색 매력이 숨쉬는 동해시로 여러분을 초대합니다.</p>
+    </header>
+
+    <div class="container">
+        
+        <!-- 5대 권역별 명소 섹션 -->
+        <section>
+            <h2 class="section-title">동해시 5대 권역별 핵심 명소</h2>
+
+            <div class="filter-bar">
+                <button class="filter-btn active" data-filter="all">전체 보기</button>
+                <button class="filter-btn" data-filter="mukho">1. 묵호권역</button>
+                <button class="filter-btn" data-filter="mureung">2. 무릉권역</button>
+                <button class="filter-btn" data-filter="chuam">3. 추암권역</button>
+                <button class="filter-btn" data-filter="cheongok">4. 천곡권역</button>
+                <button class="filter-btn" data-filter="mangsang">5. 망상권역</button>
+            </div>
+
+            <div class="grid">
+                
+                <!-- 묵호권역 -->
+                <div class="card" data-region="mukho" onclick="openModal(this)">
+                    <img src="images/mukho.png" alt="묵호권역 도째비골 스카이밸리" class="card-img">
+                    <div class="card-content">
+                        <h3>1. 묵호권역</h3>
+                        <p><strong>도째비골 스카이밸리 & 해랑전망대:</strong> 하늘 위를 걷는 듯한 스릴과 자이언트 슬라이드, 바다 위를 잇는 해랑전망대.<br><br><strong>논골담길 & 묵호등대:</strong> 1970년대 어촌의 애환과 벽화가 어우러진 감성 골목길.</p>
+                    </div>
+                </div>
+
+                <!-- 무릉권역 -->
+                <div class="card" data-region="mureung" onclick="openModal(this)">
+                    <img src="images/mureung.png" alt="무릉권역 무릉계곡" class="card-img">
+                    <div class="card-content">
+                        <h3>2. 무릉권역</h3>
+                        <p><strong>무릉계곡:</strong> 두타산과 청옥산이 빚어낸 기암괴석과 무릉반석·쌍폭포·용추폭포.<br><br><strong>무릉별유천지:</strong> 에메랄드빛 호수와 라벤더 정원, 오프로드 루지 등 복합 레포츠 공간.</p>
+                    </div>
+                </div>
+
+                <!-- 추암권역 -->
+                <div class="card" data-region="chuam" onclick="openModal(this)">
+                    <img src="images/chuam.png" alt="추암권역 추암 촛대바위" class="card-img">
+                    <div class="card-content">
+                        <h3>3. 추암권역</h3>
+                        <p><strong>추암 촛대바위 & 해암정:</strong> 애국가 첫 소절 배경이자 바다에서 솟아오른 기암괴석과 고풍스러운 정자.<br><br><strong>추암 출렁다리:</strong> 파도 위를 걷는 듯한 아찔한 해안 교량.</p>
+                    </div>
+                </div>
+
+                <!-- 천곡권역 -->
+                <div class="card" data-region="cheongok" onclick="openModal(this)">
+                    <img src="images/cheongok.png" alt="천곡권역 천곡황금박쥐동굴" class="card-img">
+                    <div class="card-content">
+                        <h3>4. 천곡권역</h3>
+                        <p><strong>천곡황금박쥐동굴:</strong> 국내 유일의 도심 속 천연 석회석 동굴이자 황금박쥐 서식지.<br><br><strong>한섬감성바닷길:</strong> 시내와 인접하며 아늑한 백사장과 데크 산책로가 이어지는 산책 명소.</p>
+                    </div>
+                </div>
+
+                <!-- 망상권역 -->
+                <div class="card" data-region="mangsang" onclick="openModal(this)">
+                    <img src="images/mangsang.png" alt="망상권역 망상해수욕장" class="card-img">
+                    <div class="card-content">
+                        <h3>5. 망상권역</h3>
+                        <p><strong>망상해수욕장 & 오토캠핑리조트:</strong> 얕은 수심과 깨끗한 백사장, 울창한 송림이 어우러진 대표 휴양지.<br><br><strong>망상해변한옥마을:</strong> 전통 한옥의 멋과 현대적 편의시설이 조화를 이룬 숙박 명소.</p>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- 테마별 추천 코스 섹션 -->
+        <section>
+            <h2 class="section-title">테마별 추천 여행 코스</h2>
+            
+            <div class="course-box">
+                <h3>🚗 당일 코스 (핵심 압축형)</h3>
+                <p>추암 촛대바위 일출 ➔ 묵호항·논골담길 ➔ 도째비골 스카이밸리 ➔ 천곡황금박쥐동굴</p>
+            </div>
+
+            <div class="course-box">
+                <h3>🌿 1박 2일 코스 (자연 & 힐링형)</h3>
+                <p><strong>1일차:</strong> 무릉계곡 및 무릉별유천지 ➔ 천곡동굴 ➔ 한섬해변 산책<br><strong>2일차:</strong> 묵호등대 및 논골담길 ➔ 망상해변 및 오토캠핑장 휴식</p>
+            </div>
+        </section>
+
+    </div>
+
+    <!-- 이미지 상세 보기 모달 -->
+    <div class="modal" id="detailModal" onclick="closeModal(event)">
+        <div class="modal-content">
+            <button class="modal-close" onclick="document.getElementById('detailModal').classList.remove('open')">&times;</button>
+            <img id="modalImg" src="" alt="">
+            <div class="modal-body">
+                <h3 id="modalTitle"></h3>
+                <p id="modalDesc"></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 푸터 -->
+    <footer>
+        <p>&copy; 2026 동해시 관광 가이드. All Rights Reserved.</p>
+    </footer>
+
+    <script>
+        const filterBtns = document.querySelectorAll('.filter-btn');
+        const cards = document.querySelectorAll('.card');
+
+        filterBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                filterBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                const target = btn.dataset.filter;
+                cards.forEach(card => {
+                    if (target === 'all' || card.dataset.region === target) {
+                        card.classList.remove('hidden');
+                    } else {
+                        card.classList.add('hidden');
+                    }
+                });
+            });
+        });
+
+        function openModal(card) {
+            const img = card.querySelector('img');
+            const title = card.querySelector('h3').textContent;
+            const desc = card.querySelector('p').innerHTML;
+            document.getElementById('modalImg').src = img.src;
+            document.getElementById('modalImg').alt = img.alt;
+            document.getElementById('modalTitle').textContent = title;
+            document.getElementById('modalDesc').innerHTML = desc;
+            document.getElementById('detailModal').classList.add('open');
+        }
+
+        function closeModal(e) {
+            if (e.target.id === 'detailModal') {
+                document.getElementById('detailModal').classList.remove('open');
+            }
+        }
+    </script>
+</body>
+</html>
